@@ -1,16 +1,13 @@
 import json
 
 class Filter():
-    rules = {
-        '__users__': {
-            'hej': { 'read': True },
-            'hopp': { 'write': True },
-            'auth': { 'allowIf': 'public' },
-        },
-        'magnus': {
-            'auth': { 'allowIf': 'magnus' }
-        }
-    }
+    
+
+    def __init__(self,rules={}):
+        self.rules = rules
+
+    def setRules(self,rules):
+        self.rules = rules
 
     def filter(self,user,data):
         allow = False
@@ -44,7 +41,17 @@ class Filter():
 
 
 if __name__ == "__main__":
-    f = Filter()
+    f = Filter({
+            '__users__': {
+                'hej': { 'read': True },
+                'hopp': { 'write': True },
+                'auth': { 'allowIf': 'public' },
+            },
+            'magnus': {
+                'auth': { 'allowIf': 'magnus' }
+            }
+        })
+        
     print json.dumps(f.filter('magnus',{
         'hej':'hopp',
         'gnu':'apa',
