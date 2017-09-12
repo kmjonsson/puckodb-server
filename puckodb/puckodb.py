@@ -72,17 +72,6 @@ class PuckoDb():
         tid  = self._getTid()
         self.storage.checkpoint(tid,self.data)
 
-class FakeStorage():
-    def load(self):
-        print "FakeStorage: load"
-        return { 'gnutt': {'.tid':4, '.deleted':True} }
-
-    def save(self,data):
-        print "FakeStorage: save", data
-
-    def checkpoint(self,tid,data):
-        print "FakeStorage: checkpoint", tid, data
-
 class FakeClient():
     def sendMessage(self, string):
         print "FakeClient: ", string
@@ -98,5 +87,5 @@ if __name__ == "__main__":
     p.update(u,{
         'delete': ['fnu']
     })
-    p.delete(u)
+#    p.delete(u)
     p.checkpoint()
