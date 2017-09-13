@@ -24,6 +24,9 @@ class PuckoWebSocketServer(SimpleWebSocketServer):
 
 # Server client instance
 class PuckoDbServer(WebSocket):
+    def setUser(self,user):
+        self.user = user
+
     def sendIt(self,message):
         print(self.address, 'sendIt', unicode(message))
         self.sendMessage(unicode(message))
@@ -48,6 +51,7 @@ class PuckoDbServer(WebSocket):
        print(self.address, 'closed')
 
 router = PuckoDbRouter()
+router.setPuckoDb(PuckoDb(PuckoDbStorage('/tmp/pucko')))
 server = PuckoWebSocketServer('', 9999, PuckoDbServer)
 server.setRouter(router)
 server.serveforever()

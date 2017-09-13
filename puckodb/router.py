@@ -17,14 +17,16 @@ class PuckoDbRouter():
             return
         print "Type: " + incomming['type']
         if incomming['type'] == 'auth':
+            client.setUser(incomming['user'])
             j = json.dumps({
                 'type': u'ok',
-                'error': u"Got IT :-)" + message
             })
             client.sendIt(j)
             return
         if incomming['type'] == 'create':
-            #self.puckodb.create
+            id = self.puckodb.create()
+            self.puckodb.update(id,incomming['data'])
+            print "Created: ",id
             return
 
         client.sendMessage(json.dumps({
