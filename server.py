@@ -4,6 +4,7 @@ from puckodb.storage import PuckoDbStorage
 from puckodb.puckodb import PuckoDb
 import json
 
+# Server Listener
 class PuckoWebSocketServer(SimpleWebSocketServer):
     clients = []
 
@@ -19,6 +20,7 @@ class PuckoWebSocketServer(SimpleWebSocketServer):
     def getClients(self):
         return self.clients
 
+# Server client instance
 class PuckoDbServer(WebSocket):
     def handleMessage(self):
         print(self.address, 'message', self.data)
