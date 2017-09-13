@@ -2,14 +2,16 @@
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 from puckodb.storage import PuckoDbStorage
 from puckodb.puckodb import PuckoDb
+from puckodb.router import PuckoDbRouter
 import json
 
 # Server Listener
 class PuckoWebSocketServer(SimpleWebSocketServer):
     clients = []
 
-    def setPuckoDb(self, puckodb):
-        self.puckodb = puckodb
+    def setRouter(self, router):
+        print "PuckoWebSocketServer: setRouter = ", router
+        self.router = router
 
     def addClient(self, client):
         self.clients.append(client)
@@ -22,18 +24,30 @@ class PuckoWebSocketServer(SimpleWebSocketServer):
 
 # Server client instance
 class PuckoDbServer(WebSocket):
+    def sendIt(self,message):
+        print(self.address, 'sendIt', unicode(message))
+        self.sendMessage(unicode(message))
+
     def handleMessage(self):
         print(self.address, 'message', self.data)
-        self.server.puckodb.parse(self,self.data)
+        try:
+            self.server.router.parse(self,unicode(self.data))
+        except Exception as inst:
+            print type(inst)     # the exception instance
+            print inst.args      # arguments stored in .args
+            print inst           
 
     def handleConnected(self):
        print(self.address, 'connected')
        self.server.addClient(self)
+       self.server.router.parse(self,'{"type":"connected"}')
 
     def handleClose(self):
        self.server.removeClient(self)
+       self.server.router.parse(self,'{"type":"disconnected"}')
        print(self.address, 'closed')
 
+router = PuckoDbRouter()
 server = PuckoWebSocketServer('', 9999, PuckoDbServer)
-server.setPuckoDb(PuckoDb(PuckoDbStorage()))
+server.setRouter(router)
 server.serveforever()
