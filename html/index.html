@@ -1,0 +1,36 @@
+</head>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.0.min.js"></script>
+<script type="text/javascript" src="jquery.simple.websocket.min.js"></script>
+<script type="text/javascript">
+$(function() {
+    var webSocket = new WebSocket('ws://192.168.2.2:9999/');
+
+    webSocket.onerror = function(event) {
+        console.log(event);
+    };
+
+    webSocket.onopen = function(event) {
+        console.log(event);
+        webSocket.send('{ "type": "auth", "user": "magnus", "password":"secret"}');
+    };
+
+    webSocket.onmessage = function(message) {
+        if(message.data instanceof Blob) { return; }
+        console.log("WebSocket: Got message: " + message.data);
+        $("#output").html($("#output").html() + "<br/>Got: " + message.data);
+    };
+
+    $("#send").click(function() {
+        $("#output").html($("#output").html() + "<br/>Sent: " + $("#input").val());
+        webSocket.send($("#input").val());
+    })
+});
+</script>
+</head>
+<body>
+    <textarea rows="5" cols="80" id="input">{ "type": "create", "data":{ "foo": "bar" }}</textarea>
+    <button id="send">Send</button>
+    <hr/>
+    <div id="output">
+    </div>
+</body>
