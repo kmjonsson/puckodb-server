@@ -2,10 +2,25 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.0.min.js"></script>
 <script type="text/javascript">
 $(function() {
-    var webSocket = new WebSocket('ws://192.168.2.2:9999/');
+    var webSocket = new WebSocket('ws://127.0.0.1:9999/');
+
+    function logit(text) {
+        $("#output").html($("#output").html() + "<br/>Got: " + text);
+    }
 
     webSocket.onerror = function(event) {
+        alert("Broken :-(");
         console.log(event);
+    };
+
+    webSocket.onclose = function(event) {        
+        logit("Closed :-(");
+        console.log(event);
+        setTimeout(function() {
+            console.log("Reconnect...")
+            logit("Reconnecting");
+            webSocket = new WebSocket('ws://127.0.0.1:9999/');
+        },5000);
     };
 
     webSocket.onopen = function(event) {
@@ -16,19 +31,36 @@ $(function() {
     webSocket.onmessage = function(message) {
         if(message.data instanceof Blob) { return; }
         console.log("WebSocket: Got message: " + message.data);
-        $("#output").html($("#output").html() + "<br/>Got: " + message.data);
+        logit("<br/>Got: " + message.data);
     };
 
+    function sendit(text) {
+        $("#output").html($("#output").html() + "<br/>Sent: " + text);
+        webSocket.send(text);
+    }
+
     $("#send").click(function() {
-        $("#output").html($("#output").html() + "<br/>Sent: " + $("#input").val());
-        webSocket.send($("#input").val());
-    })
+        sendit($("#input").val());
+    });
+
+    $("button.sendit").click(function() {
+        var uuid = $("#uuid").val();
+        var cmd = $(this).html();
+        cmd = cmd.replace("%uuid%",uuid);
+        sendit(cmd);
+    });
 });
 </script>
 </head>
 <body>
     <textarea rows="5" cols="80" id="input">{ "type": "create", "data":{"set":{ "foo": "bar" }}}</textarea>
     <button id="send">Send</button>
+    <hr/>
+    UUID: <input id="uuid" type="text">
+    <hr/>
+    <button class="sendit">{ "type": "create", "set":{ "foo": "bar" }}</button><br/>
+    <button class="sendit">{ "type": "update", "uuid":"%uuid%", "set":{ "foo": "gnu" }}</button><br/>
+    <button class="sendit">{ "type": "delete", "uuid":"%uuid%"}</button><br/>
     <hr/>
     <div id="output">
     </div>
