@@ -72,6 +72,11 @@ class PuckoDb():
         tid  = self._getTid()
         self.storage.checkpoint(tid,self.data)
 
+    def get(self,uuid): 
+        if uuid in self.data:
+            return self.data[uuid]
+        return {}
+
 class FakeClient():
     def sendMessage(self, string):
         print "FakeClient: ", string
