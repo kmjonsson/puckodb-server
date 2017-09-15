@@ -5,6 +5,9 @@ class PuckoDbRouter():
     def setPuckoDb(self,puckodb):
         self.puckodb = puckodb
 
+    def setFilter(self,filter):
+        self.filter = filter
+
     def parse(self,client,message):
         print "Parse:",client.address,message
         incomming = json.loads(message)
@@ -25,8 +28,37 @@ class PuckoDbRouter():
             return
         if incomming['type'] == 'create':
             id = self.puckodb.create()
-            self.puckodb.update(id,incomming['data'])
+            self.puckodb.update(id,incomming)
             print "Created: ",id
+            j = json.dumps({
+                'type': u'ok',
+                'id': id
+            })
+            client.sendIt(j)
+            return
+
+        if incomming['type'] == 'update':
+            id = incomming['uuid']
+            self.puckodb.update(id,incomming)
+            print "updated: ",id
+            j = json.dumps({
+                'type': u'ok',
+                'id': id
+            })
+            client.sendIt(j)
+            o = self.puckodb.get(id)
+            client.sendAll(o)
+            return
+
+        if incomming['type'] == 'delete':
+            id = incomming['uuid']
+            self.puckodb.delete(id)
+            print "deleted: ",id
+            j = json.dumps({
+                'type': u'ok',
+                'id': id
+            })
+            client.sendIt(j)
             return
 
         client.sendMessage(json.dumps({
