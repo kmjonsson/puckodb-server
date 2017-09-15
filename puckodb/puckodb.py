@@ -77,6 +77,9 @@ class PuckoDb():
             return self.data[uuid]
         return {}
 
+    def getFrom(self,fromTid):
+        return dict(map(lambda x: ( x, self.data[x] ) , filter(lambda k: self.data[k]['.tid'] >= fromTid,self.data.keys())))
+
 class FakeClient():
     def sendMessage(self, string):
         print "FakeClient: ", string
