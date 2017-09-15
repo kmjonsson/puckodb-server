@@ -22,10 +22,18 @@ class PuckoWebSocketServer(SimpleWebSocketServer):
     def getClients(self):
         return self.clients
 
+    def sendAll(self,message):
+        for client in self.clients:
+            client.sendIt(message)
+
 # Server client instance
 class PuckoDbServer(WebSocket):
     def setUser(self,user):
         self.user = user
+
+    def sendAll(self,message):
+        print(self.address, 'sendAll', unicode(message))
+        self.server.sendAll(message)
 
     def sendIt(self,message):
         print(self.address, 'sendIt', unicode(message))
