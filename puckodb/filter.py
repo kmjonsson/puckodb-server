@@ -7,7 +7,7 @@ class Filter():
     def setRules(self,rules):
         self.rules = rules
 
-    def filter(self,users,show_data):
+    def filterIt(self,users,show_data):
         allow = False
         result = {}
         admin = False
@@ -117,14 +117,14 @@ if __name__ == "__main__":
             'hopp':'groda'
         }), indent= 4, sort_keys= True)
 
-    print json.dumps(f.filter(['__users__','magnus'],{
+    print json.dumps(f.filterIt(['__users__','magnus'],{
         'hej':'hopp',
         'gnu':'apa',
         'hopp': '',
         'auth': ['public','magnus']
     }), indent= 4, sort_keys= True)
 
-    print json.dumps(f.filter(['__users__','magnu'],{
+    print json.dumps(f.filterIt(['__users__','magnu'],{
         'hej':'hopp',
         'gnu':'apa',
         'hopp': '',
