@@ -75,17 +75,12 @@ class PuckoDb():
     def get(self,uuid): 
         if uuid in self.data:
             return self.data[uuid]
-        return {}
+        return None
 
     def getFrom(self,fromTid):
         return dict(map(lambda x: ( x, self.data[x] ) , filter(lambda k: self.data[k]['.tid'] >= fromTid,self.data.keys())))
 
-class FakeClient():
-    def sendMessage(self, string):
-        print "FakeClient: ", string
-
 if __name__ == "__main__":
-    c = FakeClient()
     p = PuckoDb(PuckoDbStorage("/tmp/pucko"))
     u = p.create()
     p.update(u,{
@@ -95,5 +90,4 @@ if __name__ == "__main__":
     p.update(u,{
         'delete': ['fnu']
     })
-#    p.delete(u)
     p.checkpoint()
