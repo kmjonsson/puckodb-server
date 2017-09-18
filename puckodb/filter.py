@@ -44,7 +44,7 @@ class Filter():
 
         return result
             
-    def canWrite(self,users,original_data,new_data):
+    def canUpdate(self,users,original_data,new_data):
         allow = True
         admin = False
 
@@ -76,6 +76,18 @@ class Filter():
             
         return admin or allow
 
+    def canCreate(self,users):
+        allow = False
+
+        for u in users:
+            if u in self.rules and '__admin__' in self.rules[u]:
+                allow = True
+
+            if u in self.rules and '__creator__' in self.rules[u]:
+                allow = True
+            
+        return allow
+
 
 if __name__ == "__main__":
     f = Filter({
@@ -90,7 +102,7 @@ if __name__ == "__main__":
             }
         })
         
-    print json.dumps(f.canWrite(['__users__','magnus'],{
+    print json.dumps(f.canUpdate(['__users__','magnus'],{
             'hej':'hopp',
             'gnu':'apa',
             'hopp': '',
@@ -99,7 +111,7 @@ if __name__ == "__main__":
             'hej':'groda'
         }), indent= 4, sort_keys= True)
         
-    print json.dumps(f.canWrite(['__users__'],{
+    print json.dumps(f.canUpdate(['__users__'],{
             'hej':'hopp',
             'gnu':'apa',
             'hopp': '',
@@ -108,7 +120,7 @@ if __name__ == "__main__":
             'hej':'groda'
         }), indent= 4, sort_keys= True)
         
-    print json.dumps(f.canWrite(['__users__'],{
+    print json.dumps(f.canUpdate(['__users__'],{
             'hej':'hopp',
             'gnu':'apa',
             'hopp': '',
