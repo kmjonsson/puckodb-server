@@ -39,6 +39,7 @@ class PuckoDbServer(WebSocket):
         for k,v in extra.items():
             r[k] = v
         self.sendIt(json.dumps(r))
+        return False
 
     def ok(self,message,extra={}):
         r = {
@@ -48,6 +49,7 @@ class PuckoDbServer(WebSocket):
         for k,v in extra.items():
             r[k] = v
         self.sendIt(json.dumps(r))
+        return True
 
     def setUser(self,user):
         self.users = [u'__public__']
