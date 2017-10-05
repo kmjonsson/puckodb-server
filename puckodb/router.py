@@ -35,63 +35,72 @@ class PuckoDbRouter():
         print "Parse:",client.address,message
         incomming = json.loads(message)
         if not 'type' in incomming:
-            return client.error("no 'type' in message")
+            return client.error('error',"no 'type' in message")
 
-        print "Type: " + incomming['type']
+        if not 'id' in incomming:
+            return client.error('error',"no 'id' in message")
+
+        id = incomming['id']
+        type = incomming['type']
+
+        print "Type: %s, Id: %s" % (type,id)
 
         # AUTH
-        if incomming['type'] == 'auth':
-            client.setUser(incomming['user'])
-            return client.ok('Login successful')
+        if type == 'auth':
+            if incomming['password'] == 'correct':
+                client.setUser(incomming['user'])
+                return client.ok(id,'Login successful')
+            else:
+                return client.error(id,'Login failed')
 
-        if incomming['type'] == 'connected':
-            return client.ok('Connected')
+        if type == 'connected':
+            return client.ok(id,'Connected')
 
         # Replay
-        if incomming['type'] == 'replay':
+        if type == 'replay':
             fromTid = incomming['from']
-            client.ok('replay successful')
+            client.ok(id,'replay successful')
             objs = self.puckodb.getFrom(fromTid)
             return self.sendObjs(client,objs)
 
         # CREATE
-        if incomming['type'] == 'create':
-            if not self.filterObj.canCreate(client.getUsers())
-                return client.error("Not allowed to create object %s" % uuid)
+        if type == 'create':
+            if not self.filterObj.canCreate(client.getUsers()):
+                return client.error(id,"Not allowed to create object %s" % uuid)
 
             uuid = self.puckodb.create()
             self.puckodb.update(uuid,incomming)
-            client.ok('created',{ 'uuid': uuid })
+            client.ok(id,'created',{ 'uuid': uuid })
             return self.sendUpdate(uuid)
 
         if not 'uuid' in incomming:
-            return client.error("no 'uuid' in message")
+            return client.error(id,"no 'uuid' in message")
 
         # get UUID from message
         uuid = incomming['uuid']
         current = self.puckodb.get(uuid)
         if not current:
-            return client.error("Object %s does not exist", uuid)
+            return client.error(id,"Object %s does not exist" % uuid)
 
         # UPDATE
-        if incomming['type'] == 'update':
-            if 'set' in incomming and not self.filterObj.canUpdate(client.getUsers(),current,incomming[set])
-                return client.error("Not allowed to update object %s" % uuid)
+        if type == 'update':
+            if 'set' in incomming and not self.filterObj.canUpdate(client.getUsers(),current,incomming[set]):
+                return client.error(id,"Not allowed to update object %s" % uuid)
 
-            if 'delete' in incomming and not self.filterObj.canUpdate(client.getUsers(),current,incomming[delete])
-                return client.error("Not allowed to update object %s" % uuid)
+            if 'delete' in incomming and not self.filterObj.canUpdate(client.getUsers(),current,incomming[delete]):
+                return client.error(id,"Not allowed to delete in object %s" % uuid)
 
             self.puckodb.update(uuid,incomming)
-            client.ok('updated',{'uuid':uuid})
+            client.ok(id,'updated',{'uuid':uuid})
             return self.sendUpdate(uuid)
 
         # DELETE
-        if incomming['type'] == 'delete':
-            if not self.filterObj.canDelete(client.getUsers())
-                return client.error("Not allowed to delete object %s" % uuid)
+        if type == 'delete':
+            if not self.filterObj.canDelete(client.getUsers()):
+                return client.error(id,"Not allowed to delete object %s" % uuid)
 
             self.puckodb.delete(uuid)
-            client.ok('deleted',{'uuid':uuid})
+            client.ok(id,'deleted',{'uuid':uuid})
             return self.sendUpdate(uuid)
 
-        return client.error("Invalid 'type' in message")
+        return client.error(id,"Invalid 'type' in message")

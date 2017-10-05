@@ -31,9 +31,10 @@ class PuckoWebSocketServer(SimpleWebSocketServer):
 
 # Server client instance
 class PuckoDbServer(WebSocket):
-    def error(self,message,extra={}):
+    def error(self,type,message,extra={}):
         r = {
-            'type': u'error',
+            'id': id,
+            'response': u'error',
             'message': message
         }
         for k,v in extra.items():
@@ -41,9 +42,10 @@ class PuckoDbServer(WebSocket):
         self.sendIt(json.dumps(r))
         return False
 
-    def ok(self,message,extra={}):
+    def ok(self,id,message,extra={}):
         r = {
-            'type': u'ok',
+            'id': id,
+            'response': u'ok',
             'message': message
         }
         for k,v in extra.items():
@@ -84,11 +86,10 @@ class PuckoDbServer(WebSocket):
        print(self.address, 'connected')
        self.setUser('')
        self.server.addClient(self)
-       self.server.router.parse(self,'{"type":"connected"}')
+       self.server.router.parse(self,'{"id":0,"type":"connected"}')
 
     def handleClose(self):
        self.server.removeClient(self)
-       #self.server.router.parse(self,'{"type":"disconnected"}')
        print(self.address, 'closed')
 
 router = PuckoDbRouter()
@@ -108,7 +109,10 @@ router.setFilter(Filter({
                 '__admin__': True
             }
 }))
-router.setPuckoDb(PuckoDb(PuckoDbStorage('/tmp/pucko')))
+storage = PuckoDbStorage('/tmp/pucko')
+puckodb = PuckoDb(storage)
+puckodb.checkpoint()
+router.setPuckoDb(puckodb)
 server = PuckoWebSocketServer('', 9999, PuckoDbServer)
 router.setServer(server)
 server.setRouter(router)
