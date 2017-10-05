@@ -31,7 +31,7 @@ class PuckoWebSocketServer(SimpleWebSocketServer):
 
 # Server client instance
 class PuckoDbServer(WebSocket):
-    def error(self,type,message,extra={}):
+    def error(self,id,message,extra={}):
         r = {
             'id': id,
             'response': u'error',
@@ -39,7 +39,7 @@ class PuckoDbServer(WebSocket):
         }
         for k,v in extra.items():
             r[k] = v
-        self.sendIt(json.dumps(r))
+        self.sendObj(r)
         return False
 
     def ok(self,id,message,extra={}):
@@ -71,8 +71,8 @@ class PuckoDbServer(WebSocket):
         self.sendMessage(unicode(message))
 
     def sendObj(self,obj):
-        print(self.address, 'sendObj', json.dumps(obj))
-        self.sendMessage(json.dumps(obj))
+        print(self.address, 'sendObj', obj)
+        self.sendMessage(unicode(json.dumps(obj)))
 
     def handleMessage(self):
         print(self.address, 'message', self.data)
