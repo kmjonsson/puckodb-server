@@ -84,10 +84,10 @@ class PuckoDbRouter():
 
         # UPDATE
         if type == 'update':
-            if 'set' in incomming and not self.filterObj.canUpdate(client.getUsers(),current,incomming['set']):
+            if 'set' in incomming and not self.filterObj.canUpdate(client.getUsers(),current,incomming):
                 return client.error(id,"Not allowed to update object %s" % uuid)
 
-            if 'delete' in incomming and not self.filterObj.canUpdate(client.getUsers(),current,incomming['delete']):
+            if 'delete' in incomming and not self.filterObj.canUpdate(client.getUsers(),current,incomming):
                 return client.error(id,"Not allowed to delete in object %s" % uuid)
 
             self.puckodb.update(uuid,incomming)

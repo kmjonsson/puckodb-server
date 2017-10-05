@@ -88,6 +88,20 @@ class Filter():
             
         return allow
 
+    def canDelete(self,users):
+        allow = False
+
+        for u in users:
+            if u in self.rules and '__admin__' in self.rules[u]:
+                allow = True
+
+            if u in self.rules and '__creator__' in self.rules[u]:
+                allow = True
+
+            if u in self.rules and '__deleter__' in self.rules[u]:
+                allow = True
+            
+        return allow
 
 if __name__ == "__main__":
     f = Filter({
