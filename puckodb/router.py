@@ -21,14 +21,14 @@ class PuckoDbRouter():
             d = self.filterObj.filterIt(c.getUsers(),o)
             print "sendUpdate (after filter)",c.getUsers(),d
             if '.tid' in d:
-                c.sendIt({uuid: d})
+                c.sendObj({'type':'object', uuid: d})
         return True
 
     def sendObjs(self,client,objs):
         for k,v in objs.items():
             d = self.filterObj.filterIt(client.getUsers(),v)
             if '.tid' in d:
-                client.sendIt({ k: d })
+                client.sendObj({'type':'object', k: d })
         return True
 
     def parse(self,client,message):

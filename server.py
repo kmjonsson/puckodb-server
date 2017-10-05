@@ -70,6 +70,10 @@ class PuckoDbServer(WebSocket):
         print(self.address, 'sendIt', unicode(message))
         self.sendMessage(unicode(message))
 
+    def sendObj(self,obj):
+        print(self.address, 'sendObj', json.dumps(obj))
+        self.sendMessage(json.dumps(obj))
+
     def handleMessage(self):
         print(self.address, 'message', self.data)
         try:
@@ -113,7 +117,7 @@ storage = PuckoDbStorage('/tmp/pucko')
 puckodb = PuckoDb(storage)
 puckodb.checkpoint()
 router.setPuckoDb(puckodb)
-server = PuckoWebSocketServer('', 9999, PuckoDbServer)
+server = PuckoWebSocketServer('localhost', 9999, PuckoDbServer)
 router.setServer(server)
 server.setRouter(router)
 server.serveforever()
